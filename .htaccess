@@ -1,0 +1,2 @@
+# Menolak akses langsung ke folder includes
+RedirectMatch 403 ^/(.*/)?includes/
