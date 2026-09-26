@@ -139,3 +139,12 @@ a.stat:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .grp-pilihdasar select:focus{border-color:var(--green);outline:0}
 .grp-satuan-head{margin-top:1.2rem}
 .grp-satuan-head .lbl{font-weight:700}
+
+/* ---- Form kecil sebaris (inventory & pesanan) ---- */
+.inline-form{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.mini-input{font:inherit;padding:.4rem .6rem;border:2px solid var(--line);border-radius:8px;width:11rem}
+.mini-input:focus{border-color:var(--green);outline:0}
+
+/* ---- Halaman detail PO kasir ---- */
+.po-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+.po-reject{display:flex;gap:.6rem;align-items:center}

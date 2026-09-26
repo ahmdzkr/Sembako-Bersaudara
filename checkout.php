@@ -27,19 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($v['alamat'] === '') { $err['alamat'] = 'Isi alamat pengiriman.'; }
 
         if (!$err) {
+            // PO dibuat dengan status 'menunggu_verifikasi'. Stok BELUM dikurangi di sini —
+            // stok baru dikurangi saat kasir menyetujui PO (lihat includes/orders.php::po_approve).
+            // Jumlah beli tetap sudah dibatasi sesuai stok saat ini lewat cart_items() di atas,
+            // jadi ini hanya jaga-jaga sederhana, bukan penguncian stok.
             $pdo = db();
             try {
                 $pdo->beginTransaction();
-
-                // Kunci ulang stok tiap baris tepat sebelum menyimpan, supaya tidak terjual melebihi stok.
-                foreach ($items as $it) {
-                    $butuh = kebutuhan_stok($it['product'], $it['mode'], $it['qty']);
-                    $q = $pdo->prepare('UPDATE products SET stok = stok - ? WHERE id = ? AND stok >= ?');
-                    $q->execute([$butuh, $it['product']['id'], $butuh]);
-                    if ($q->rowCount() !== 1) {
-                        throw new RuntimeException($it['product']['nama'] . ' stoknya tidak lagi mencukupi.');
-                    }
-                }
 
                 $q = $pdo->prepare('INSERT INTO orders (user_id, nama_penerima, telepon, alamat, catatan, total) VALUES (?,?,?,?,?,?)');
                 $q->execute([$_SESSION['user_id'], $v['nama_penerima'], $v['telepon'], $v['alamat'], $v['catatan'] ?: null, $total]);
@@ -52,12 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $pdo->commit();
                 cart_clear();
-                $_SESSION['flash'] = ['success', 'Pesanan ' . no_pesanan($orderId) . ' berhasil dibuat. Terima kasih!'];
+                $_SESSION['flash'] = ['success', 'PO ' . no_pesanan($orderId) . ' berhasil dibuat dan menunggu verifikasi kasir. Terima kasih!'];
                 header('Location: pesanan.php');
                 exit;
             } catch (Throwable $e) {
                 $pdo->rollBack();
-                $err['umum'] = $e instanceof RuntimeException ? $e->getMessage() : 'Pesanan gagal disimpan. Coba lagi.';
+                $err['umum'] = 'Pesanan gagal disimpan. Coba lagi.';
             }
         }
     }
@@ -94,7 +88,7 @@ require __DIR__ . '/includes/customer_topbar.php';
       <textarea id="catatan" name="catatan" rows="2" maxlength="300"><?= e($v['catatan']) ?></textarea>
 
       <button class="btn" type="submit">Buat pesanan</button>
-      <p class="hint">Pembayaran dilakukan saat barang diterima (COD). Admin akan menghubungi Anda untuk konfirmasi.</p>
+      <p class="hint">Setelah PO dibuat, kasir akan memeriksa dokumen dan keuangan terlebih dahulu sebelum pesanan diproses. Anda bisa memantau statusnya di halaman Pesanan saya.</p>
     </form>
 
     <aside class="pform-side co-summary">

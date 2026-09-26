@@ -13,10 +13,26 @@ const KATEGORI  = ['Fresh Good', 'Dry Good', 'Lainnya'];
 // Pilihan basis berat/volume untuk Dry Good (Fresh Good selalu 'kg', Lainnya selalu tanpa basis).
 const SATUAN_DASAR_PILIHAN = ['kg' => 'Kilogram (kg)', 'liter' => 'Liter'];
 
+// Alur status PO (Purchase Order), berurutan sesuai tahapan bisnis.
+// label = teks yang tampil ke pengguna, kelas = akhiran class CSS badge (.badge.status-<kelas>).
+const STATUS_PESANAN = [
+    'menunggu_verifikasi' => 'Menunggu verifikasi',
+    'siap_diproses'       => 'Siap diproses',
+    'siap_kirim'          => 'Siap kirim',
+    'dikirim'             => 'Dikirim',
+    'diterima'            => 'Diterima',
+    'dibatalkan'          => 'Dibatalkan',
+];
+
+function label_status(string $status): string
+{
+    return STATUS_PESANAN[$status] ?? $status;
+}
+
 session_start();
 
-// Awalan URL relatif: halaman di folder admin/ perlu naik satu tingkat.
-define('ROOT', basename(dirname($_SERVER['SCRIPT_FILENAME'])) === 'admin' ? '../' : '');
+// Awalan URL relatif: halaman di folder admin/ atau kasir/ perlu naik satu tingkat.
+define('ROOT', in_array(basename(dirname($_SERVER['SCRIPT_FILENAME'])), ['admin', 'kasir'], true) ? '../' : '');
 
 function db(): PDO
 {
@@ -75,10 +91,21 @@ function is_admin(): bool
     return ($_SESSION['role'] ?? '') === 'admin';
 }
 
+function is_kasir(): bool
+{
+    return ($_SESSION['role'] ?? '') === 'kasir';
+}
+
 /** Halaman utama sesuai peran. */
 function home_url(): string
 {
-    return ROOT . (is_admin() ? 'admin/index.php' : 'beranda.php');
+    if (is_admin()) {
+        return ROOT . 'admin/index.php';
+    }
+    if (is_kasir()) {
+        return ROOT . 'kasir/index.php';
+    }
+    return ROOT . 'beranda.php';
 }
 
 function require_login(): void
@@ -90,21 +117,31 @@ function require_login(): void
     }
 }
 
-/** Halaman khusus customer; admin diarahkan ke dashboard. */
+/** Halaman khusus customer; admin/kasir diarahkan ke halaman kerja masing-masing. */
 function require_customer(): void
 {
     require_login();
-    if (is_admin()) {
+    if (is_admin() || is_kasir()) {
         header('Location: ' . home_url());
         exit;
     }
 }
 
-/** Halaman khusus admin; customer diarahkan ke beranda. */
+/** Halaman khusus admin; peran lain diarahkan ke halaman masing-masing. */
 function require_admin(): void
 {
     require_login();
     if (!is_admin()) {
+        header('Location: ' . home_url());
+        exit;
+    }
+}
+
+/** Halaman khusus kasir; peran lain diarahkan ke halaman masing-masing. */
+function require_kasir(): void
+{
+    require_login();
+    if (!is_kasir()) {
         header('Location: ' . home_url());
         exit;
     }

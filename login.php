@@ -42,7 +42,7 @@ require __DIR__ . '/includes/header.php';
 
   <section class="login-panel">
     <h1>Selamat datang</h1>
-    <p class="muted">Supplier Sembako & Bahan Makanan</p>
+    <p class="muted">Masuk untuk melihat kebutuhan pokok di toko kami.</p>
 
     <?php if ($error): ?>
       <div class="alert alert-error" role="alert"><?= e($error) ?></div>
@@ -54,13 +54,17 @@ require __DIR__ . '/includes/header.php';
       <?= csrf_field() ?>
       <label for="email">Email</label>
       <input id="email" name="email" type="email" autocomplete="email" required autofocus
-            placeholder="nama@email.com" value="<?= e($_POST['email'] ?? '') ?>">
+             placeholder="nama@email.com" value="<?= e($_POST['email'] ?? '') ?>">
 
       <label for="password">Kata sandi</label>
       <input id="password" name="password" type="password" autocomplete="current-password" required>
 
       <button type="submit" class="btn">Masuk</button>
     </form>
+
+    <p class="demo muted">Akun contoh: <b>budi@gmail.com</b> / <b>customer123</b> (customer) &middot;
+      <b>kasir@sembako.com</b> / <b>kasir123</b> (kasir) &middot;
+      <b>admin@sembako.com</b> / <b>admin123</b> (admin)</p>
   </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

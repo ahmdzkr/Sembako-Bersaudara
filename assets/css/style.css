@@ -129,9 +129,11 @@ h1,h2{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.1
 .order-total{margin-left:auto;font:800 1.1rem "Baloo 2",sans-serif}
 .order-card .rows{margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--line)}
 .order-alamat{font-size:.92rem;color:var(--muted);margin:.6rem 0 0}
-.badge.status-baru{background:#fdf0cc;color:var(--amber)}
-.badge.status-diproses{background:#dcebfd;color:#1d5fa8}
-.badge.status-selesai{background:#e3f3e8;color:var(--green-dark)}
+.badge.status-menunggu_verifikasi{background:#fdf0cc;color:var(--amber)}
+.badge.status-siap_diproses{background:#dcebfd;color:#1d5fa8}
+.badge.status-siap_kirim{background:#e3ddfb;color:#5b3ea6}
+.badge.status-dikirim{background:#fde3cb;color:var(--orange-dark)}
+.badge.status-diterima{background:#e3f3e8;color:var(--green-dark)}
 .badge.status-dibatalkan{background:#fde8e6;color:var(--danger)}
 
 @media (max-width:760px){
@@ -207,3 +209,12 @@ a.card *{text-decoration:none}
 .table tr:last-child td{border-bottom:0}
 .table .num{text-align:right}
 .table .center{text-align:center}
+
+/* ---- Tracker status pesanan (customer) ---- */
+.tracker{display:flex;flex-wrap:wrap;gap:0;list-style:none;margin:1rem 0;padding:0;font-size:.85rem}
+.tracker li{position:relative;padding:.4rem .9rem .4rem 1.6rem;color:var(--muted);background:#f3ecdf;border-radius:99px;margin:.2rem .3rem .2rem 0;font-weight:600}
+.tracker li::before{content:"";position:absolute;left:.6rem;top:50%;transform:translateY(-50%);width:.5rem;height:.5rem;border-radius:50%;background:var(--muted)}
+.tracker li.done{background:#e3f3e8;color:var(--green-dark)}
+.tracker li.done::before{background:var(--green-dark)}
+.order-actions{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line)}
+.order-actions form{display:inline}

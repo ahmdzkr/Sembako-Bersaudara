@@ -1,0 +1,41 @@
+/* Gaya halaman dokumen cetak: surat PO, surat jalan, label, invoice. */
+:root{--ink:#2b2b26;--muted:#6d6a60;--line:#e2ddd0;--green-dark:#155a32;--orange-dark:#b4501f}
+*{box-sizing:border-box}
+body.doc{font-family:"Nunito",system-ui,sans-serif;color:var(--ink);margin:0;background:#f2f0ea}
+.doc-toolbar{position:sticky;top:0;z-index:5;background:var(--green-dark);color:#fff;padding:.7rem 1rem;display:flex;gap:.7rem;align-items:center;justify-content:flex-end}
+.doc-toolbar a,.doc-toolbar button{background:#fff;color:var(--green-dark);border:0;border-radius:8px;padding:.5rem 1.1rem;font:700 .95rem "Nunito",sans-serif;cursor:pointer;text-decoration:none}
+.doc-page{max-width:800px;margin:1.5rem auto;background:#fff;padding:2.2rem 2.5rem;box-shadow:0 2px 10px rgba(0,0,0,.08);border-radius:6px}
+.doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--green-dark);padding-bottom:1rem;margin-bottom:1.2rem;gap:1rem}
+.doc-brand{font:800 1.5rem "Baloo 2","Nunito",sans-serif;color:var(--green-dark);margin:0}
+.doc-brand em{color:var(--orange-dark)}
+.doc-brand-sub{margin:.2rem 0 0;color:var(--muted);font-size:.85rem}
+.doc-title{text-align:right}
+.doc-title h1{margin:0;font-size:1.35rem}
+.doc-meta{color:var(--muted);font-size:.92rem;margin:.2rem 0 0}
+table.doc-table{width:100%;border-collapse:collapse;margin:1rem 0}
+table.doc-table th,table.doc-table td{border:1px solid var(--line);padding:.55rem .7rem;text-align:left;font-size:.94rem}
+table.doc-table th{background:#faf3e6}
+table.doc-table .num{text-align:right}
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
+.doc-box{border:1px solid var(--line);border-radius:8px;padding:.9rem 1.1rem}
+.doc-box h3{margin:0 0 .4rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+.doc-box p{margin:0;line-height:1.55}
+.doc-sign{display:flex;justify-content:space-between;margin-top:3rem;gap:2rem}
+.doc-sign div{flex:1;text-align:center}
+.doc-sign .line{margin-top:3.2rem;border-top:1px solid #333;padding-top:.3rem;font-size:.9rem;color:var(--muted)}
+.doc-total{text-align:right;font:800 1.2rem "Baloo 2","Nunito",sans-serif;color:var(--green-dark);margin-top:.6rem}
+.doc-status{display:inline-block;padding:.25rem .8rem;border-radius:99px;font-size:.82rem;font-weight:700;background:#e3f3e8;color:var(--green-dark)}
+
+/* Label pengiriman: ukuran kompak, dicetak terpisah dari dokumen lain */
+.label-page{max-width:420px}
+.label-box{border:2px dashed #999;border-radius:10px;padding:1.2rem 1.4rem;margin-top:1rem}
+.label-from{font-size:.85rem;color:var(--muted);border-bottom:1px dashed var(--line);padding-bottom:.6rem;margin-bottom:.8rem}
+.label-to h2{margin:.2rem 0;font-size:1.3rem}
+.label-to p{margin:0;line-height:1.55}
+.label-no{margin-top:1rem;padding-top:.8rem;border-top:1px dashed var(--line);display:flex;justify-content:space-between;font-weight:700}
+
+@media print{
+  .no-print{display:none!important}
+  body.doc{background:#fff}
+  .doc-page{box-shadow:none;margin:0;padding:0;border-radius:0;max-width:none}
+}

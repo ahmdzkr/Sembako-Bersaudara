@@ -16,18 +16,34 @@ function icon(string $nama, int $ukuran = 20): string
         'users'  => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
         'check'  => '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
         'search' => '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+        'clip'   => '<path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 12h6M9 16h6"/>',
+        'truck'  => '<rect x="1" y="6" width="13" height="11" rx="1"/><path d="M14 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/>',
+        'printer'=> '<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M6 17h12v4H6z"/>',
     ];
     return '<svg class="ic" width="' . $ukuran . '" height="' . $ukuran . '" viewBox="0 0 24 24" fill="none" '
          . 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
          . ($p[$nama] ?? '') . '</svg>';
 }
 
-/** Membuka halaman admin: header HTML, sidebar, dan topbar. */
-function admin_start(string $judulHalaman, string $aktif): void
+/**
+ * Membuka halaman staf (admin atau kasir): header HTML, sidebar, dan topbar.
+ * $peran menentukan menu sidebar yang tampil ('admin' atau 'kasir').
+ */
+function admin_start(string $judulHalaman, string $aktif, string $peran = 'admin'): void
 {
-    $perluIsi = (int) db()->query('SELECT COUNT(*) FROM products WHERE stok <= ' . LOW_STOCK)->fetchColumn();
     preg_match('/^./u', $_SESSION['nama'], $huruf);
-    $inisial  = strtoupper($huruf[0] ?? 'A');
+    $inisial = strtoupper($huruf[0] ?? 'A');
+
+    // Lonceng notifikasi: admin diingatkan stok menipis, kasir diingatkan PO yang menunggu.
+    if ($peran === 'kasir') {
+        $jumlahNotif = (int) db()->query("SELECT COUNT(*) FROM orders WHERE status = 'menunggu_verifikasi'")->fetchColumn();
+        $notifHref   = 'index.php';
+        $notifLabel  = $jumlahNotif . ' PO menunggu verifikasi';
+    } else {
+        $jumlahNotif = (int) db()->query('SELECT COUNT(*) FROM products WHERE stok <= ' . LOW_STOCK)->fetchColumn();
+        $notifHref   = 'inventory.php?status=perlu';
+        $notifLabel  = $jumlahNotif . ' produk perlu diisi ulang';
+    }
 
     $judul    = $judulHalaman . ' · Sembako Bersaudara';
     $extraCss = ['admin.css'];
@@ -39,11 +55,17 @@ function admin_start(string $judulHalaman, string $aktif): void
       <img src="../assets/img/logo-mark.png" alt="" width="44" height="44">
       <span>Sembako <em>Bersaudara</em></span>
     </a>
-    <nav class="nav" aria-label="Menu admin">
+    <nav class="nav" aria-label="Menu <?= e($peran) ?>">
       <p class="side-group">Menu utama</p>
-      <a href="index.php"<?= $aktif === 'dashboard' ? ' class="active" aria-current="page"' : '' ?>><?= icon('home') ?> Dashboard</a>
-      <a href="inventory.php"<?= $aktif === 'inventory' ? ' class="active" aria-current="page"' : '' ?>><?= icon('box') ?> Stok produk</a>
-      <a href="produk.php"<?= $aktif === 'tambah' ? ' class="active" aria-current="page"' : '' ?>><?= icon('plus') ?> Tambah produk</a>
+      <?php if ($peran === 'kasir'): ?>
+        <a href="index.php"<?= $aktif === 'verifikasi' ? ' class="active" aria-current="page"' : '' ?>><?= icon('clip') ?> Verifikasi PO</a>
+        <a href="riwayat.php"<?= $aktif === 'riwayat' ? ' class="active" aria-current="page"' : '' ?>><?= icon('layers') ?> Riwayat PO</a>
+      <?php else: ?>
+        <a href="index.php"<?= $aktif === 'dashboard' ? ' class="active" aria-current="page"' : '' ?>><?= icon('home') ?> Dashboard</a>
+        <a href="inventory.php"<?= $aktif === 'inventory' ? ' class="active" aria-current="page"' : '' ?>><?= icon('box') ?> Stok produk</a>
+        <a href="produk.php"<?= $aktif === 'tambah' ? ' class="active" aria-current="page"' : '' ?>><?= icon('plus') ?> Tambah produk</a>
+        <a href="pesanan.php"<?= $aktif === 'pesanan' ? ' class="active" aria-current="page"' : '' ?>><?= icon('truck') ?> Pesanan</a>
+      <?php endif; ?>
 
       <p class="side-group">Akun</p>
       <form method="post" action="../logout.php">
@@ -58,9 +80,9 @@ function admin_start(string $judulHalaman, string $aktif): void
     <header class="admin-top">
       <button class="icon-btn square" id="navToggle" type="button" aria-label="Buka atau tutup menu" aria-controls="sidebar"><?= icon('panel') ?></button>
       <div class="top-right">
-        <a class="icon-btn" href="inventory.php?status=perlu" aria-label="<?= $perluIsi ?> produk perlu diisi ulang">
+        <a class="icon-btn" href="<?= e($notifHref) ?>" aria-label="<?= e($notifLabel) ?>">
           <?= icon('bell', 22) ?>
-          <?php if ($perluIsi > 0): ?><span class="dot"><?= $perluIsi ?></span><?php endif; ?>
+          <?php if ($jumlahNotif > 0): ?><span class="dot"><?= $jumlahNotif ?></span><?php endif; ?>
         </a>
         <span class="who"><?= e($_SESSION['nama']) ?></span>
         <span class="avatar" aria-hidden="true"><?= e($inisial) ?></span>
