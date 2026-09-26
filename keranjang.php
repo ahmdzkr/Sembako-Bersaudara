@@ -55,58 +55,35 @@ require __DIR__ . '/includes/customer_topbar.php';
       <p class="muted">Yuk pilih produk dulu di <a href="beranda.php">halaman produk</a>.</p>
     </section>
   <?php else: ?>
-    <form method="post" id="form-keranjang">
+    <form method="post">
       <?= csrf_field() ?>
       <input type="hidden" name="aksi" value="ubah">
-      <div class="cart-wrap">
-        <table class="cart-table">
-          <thead>
-            <tr>
-              <th scope="col">Produk</th>
-              <th scope="col">Cara beli</th>
-              <th scope="col" class="num">Harga</th>
-              <th scope="col" class="center">Jumlah</th>
-              <th scope="col" class="num">Subtotal</th>
-              <th scope="col"><span class="sr">Aksi</span></th>
-            </tr>
-          </thead>
+      <div class="table-wrap">
+        <table class="table cart-table">
+          <thead><tr><th>Produk</th><th>Cara beli</th><th class="num">Harga</th><th class="num">Jumlah</th><th class="num">Subtotal</th><th></th></tr></thead>
           <tbody>
-          <?php foreach ($items as $i => $it): $p = $it['product']; ?>
+          <?php foreach ($items as $it): $p = $it['product']; ?>
             <tr>
-              <td data-label="Produk">
-                <span class="pcell">
-                  <span class="pthumb"><?php if ($p['gambar']): ?><img src="assets/uploads/<?= e($p['gambar']) ?>" alt=""><?php else: ?><?= emoji_kategori($p['kategori']) ?><?php endif; ?></span>
-                  <strong><?= e($p['nama']) ?></strong>
-                </span>
-              </td>
-              <td data-label="Cara beli">per <?= e($it['label']) ?></td>
-              <td data-label="Harga" class="num"><?= rupiah($it['harga']) ?></td>
-              <td data-label="Jumlah" class="center">
+              <td><span class="pcell"><span class="pthumb"><?php if ($p['gambar']): ?><img src="assets/uploads/<?= e($p['gambar']) ?>" alt=""><?php else: ?><?= emoji_kategori($p['kategori']) ?><?php endif; ?></span><strong><?= e($p['nama']) ?></strong></span></td>
+              <td>per <?= e($it['label']) ?></td>
+              <td class="num"><?= rupiah($it['harga']) ?></td>
+              <td class="num">
                 <input type="number" name="qty[<?= e($it['key']) ?>]" value="<?= $it['qty'] ?>" min="1" max="<?= $it['maks'] ?>" class="qty-input" aria-label="Jumlah <?= e($p['nama']) ?>">
               </td>
-              <td data-label="Subtotal" class="num"><strong><?= rupiah($it['subtotal']) ?></strong></td>
-              <td class="aksi"><button class="link-btn" type="submit" form="hapus-<?= $i ?>">Hapus</button></td>
+              <td class="num"><?= rupiah($it['subtotal']) ?></td>
+              <td><button class="link-btn" type="submit" name="aksi" value="hapus" formnovalidate onclick="this.form.key.value='<?= e($it['key']) ?>'">Hapus</button></td>
             </tr>
           <?php endforeach; ?>
           </tbody>
         </table>
       </div>
+      <input type="hidden" name="key" value="">
       <div class="cart-actions">
         <button class="btn btn-small" type="submit">Perbarui jumlah</button>
         <div class="cart-total">Total: <strong><?= rupiah($total) ?></strong></div>
       </div>
     </form>
-
-    <?php /* Form hapus dipisah dari form utama supaya menekan Enter di kolom jumlah tidak ikut menghapus produk pertama. */ ?>
-    <?php foreach ($items as $i => $it): ?>
-      <form method="post" id="hapus-<?= $i ?>" hidden>
-        <?= csrf_field() ?>
-        <input type="hidden" name="aksi" value="hapus">
-        <input type="hidden" name="key" value="<?= e($it['key']) ?>">
-      </form>
-    <?php endforeach; ?>
-
-    <p class="checkout-cta"><a class="btn" href="">Lanjut ke checkout</a></p>
+    <p class="checkout-cta"><a class="btn" href="checkout.php">Lanjut ke checkout</a></p>
   <?php endif; ?>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -30,7 +30,7 @@ admin_start('Hapus produk', 'inventory');
 ?>
 <div class="confirm">
   <h1 class="page-title">Hapus produk ini?</h1>
-  <p><strong><?= e($p['nama']) ?></strong> (<?= e($p['kategori']) ?>, stok <?= angka((int) $p['stok']) ?> <?= SATUAN ?>)
+  <p><strong><?= e($p['nama']) ?></strong> (<?= e($p['kategori']) ?>, stok <?= e(stok_teks($p)) ?>)
      akan dihapus dari toko dan tidak lagi terlihat oleh customer. Tindakan ini tidak bisa dibatalkan.</p>
   <form method="post" class="confirm-actions">
     <?= csrf_field() ?>

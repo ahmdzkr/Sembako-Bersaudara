@@ -70,17 +70,17 @@ require __DIR__ . '/includes/customer_topbar.php';
 
       <?php if ($st !== 'habis'): ?>
         <div class="detail-beli">
-          <?php if (jual_kg($p)): $m = maks_beli($p, 'kg'); ?>
+          <?php if (jual_dasar($p)): $m = maks_beli($p, 'dasar'); ?>
             <form method="post" class="beli-baris">
               <?= csrf_field() ?>
-              <input type="hidden" name="mode" value="kg">
-              <label for="qty-kg">Beli per kg</label>
+              <input type="hidden" name="mode" value="dasar">
+              <label for="qty-dasar">Beli per <?= e($p['satuan_dasar']) ?></label>
               <div class="beli-input">
-                <input id="qty-kg" name="qty" type="number" min="1" max="<?= $m ?>" value="1" class="qty-input">
-                <span class="beli-label">kg</span>
+                <input id="qty-dasar" name="qty" type="number" min="1" max="<?= $m ?>" value="1" class="qty-input">
+                <span class="beli-label"><?= e($p['satuan_dasar']) ?></span>
                 <button class="btn" type="submit">+ Keranjang</button>
               </div>
-              <p class="hint">Tersedia <?= angka($m) ?> kg.</p>
+              <p class="hint">Tersedia <?= angka($m) ?> <?= e($p['satuan_dasar']) ?>.</p>
             </form>
           <?php endif; ?>
           <?php if (jual_satuan($p)): $m = maks_beli($p, 'satuan'); ?>

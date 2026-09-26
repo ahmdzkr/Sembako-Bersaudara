@@ -5,11 +5,13 @@ const DB_NAME = 'sembako';
 const DB_USER = 'root';
 const DB_PASS = '';          // XAMPP default: kosong
 
-const LOW_STOCK = 100;       // stok (kg atau satuan) <= angka ini dianggap menipis
-const SATUAN    = 'kg';      // semua produk dijual per kilogram
+const LOW_STOCK = 100;       // stok (dalam satuan_dasar, atau satuan) <= angka ini dianggap menipis
 
 // Kategori produk (tetap 3). Urutan ini dipakai di seluruh halaman.
 const KATEGORI  = ['Fresh Good', 'Dry Good', 'Lainnya'];
+
+// Pilihan basis berat/volume untuk Dry Good (Fresh Good selalu 'kg', Lainnya selalu tanpa basis).
+const SATUAN_DASAR_PILIHAN = ['kg' => 'Kilogram (kg)', 'liter' => 'Liter'];
 
 session_start();
 
@@ -145,30 +147,32 @@ function hapus_file_foto(?string $nama): void
 }
 
 
-// ---- Aturan penjualan per kategori ----
-// Fresh Good: hanya kg | Dry Good: kg atau satuan | Lainnya: hanya satuan
+// ---- Aturan penjualan produk ----
+// Ditentukan dari data produk, bukan cuma nama kategori, supaya Dry Good bisa
+// beragam: basis kg (beras), basis liter (minyak), atau tanpa basis sama
+// sekali dan hanya dijual per kemasan (kopi sachet, susu kaleng).
 
-function jual_kg(array $p): bool
+/** Produk ini bisa dibeli berdasarkan satuan dasarnya (kg atau liter)? */
+function jual_dasar(array $p): bool
 {
-    return $p['kategori'] !== 'Lainnya';
+    return ($p['satuan_dasar'] ?? '') !== '' && $p['satuan_dasar'] !== null;
 }
 
+/** Produk ini bisa dibeli per kemasan (karung, jerigen, sachet, kaleng, ...)? */
 function jual_satuan(array $p): bool
 {
-    return $p['kategori'] !== 'Fresh Good'
-        && ($p['satuan'] ?? '') !== '' && $p['harga_satuan'] !== null
-        && ($p['kategori'] === 'Lainnya' || (int) $p['isi_kg'] > 0);
+    return ($p['satuan'] ?? '') !== '' && $p['satuan'] !== null && $p['harga_satuan'] !== null;
 }
 
 function mode_valid(array $p, string $mode): bool
 {
-    return ($mode === 'kg' && jual_kg($p)) || ($mode === 'satuan' && jual_satuan($p));
+    return ($mode === 'dasar' && jual_dasar($p)) || ($mode === 'satuan' && jual_satuan($p));
 }
 
-/** Nama satuan stok: 'kg' (Fresh/Dry) atau nama satuan (Lainnya). */
+/** Nama satuan stok: satuan_dasar (kg/liter) jika ada, atau nama kemasan (mis. Lainnya, atau Dry Good tanpa basis). */
 function unit_stok(array $p): string
 {
-    return $p['kategori'] === 'Lainnya' ? (string) $p['satuan'] : 'kg';
+    return jual_dasar($p) ? (string) $p['satuan_dasar'] : (string) $p['satuan'];
 }
 
 function stok_teks(array $p): string
@@ -176,52 +180,53 @@ function stok_teks(array $p): string
     return angka((int) $p['stok']) . ' ' . unit_stok($p);
 }
 
+/** Harga utama yang tampil di kartu/detail: per satuan dasar jika ada, kalau tidak per kemasan. */
 function harga_utama(array $p): string
 {
-    return jual_kg($p)
-        ? rupiah((int) $p['harga']) . ' / kg'
+    return jual_dasar($p)
+        ? rupiah((int) $p['harga']) . ' / ' . $p['satuan_dasar']
         : rupiah((int) $p['harga_satuan']) . ' / ' . $p['satuan'];
 }
 
-/** Harga alternatif per satuan untuk Dry Good, mis. "Rp 365.000 / karung (isi 25 kg)". */
+/** Harga alternatif per kemasan, mis. "Rp 365.000 / karung (isi 25 kg)". Hanya ada jika produk punya KEDUANYA. */
 function harga_alt(array $p): ?string
 {
-    if ($p['kategori'] !== 'Dry Good' || !jual_satuan($p)) {
+    if (!jual_dasar($p) || !jual_satuan($p)) {
         return null;
     }
-    return rupiah((int) $p['harga_satuan']) . ' / ' . $p['satuan'] . ' (isi ' . angka((int) $p['isi_kg']) . ' kg)';
+    return rupiah((int) $p['harga_satuan']) . ' / ' . $p['satuan'] . ' (isi ' . angka((int) $p['isi_dasar']) . ' ' . $p['satuan_dasar'] . ')';
 }
 
 function harga_mode(array $p, string $mode): int
 {
-    return $mode === 'kg' ? (int) $p['harga'] : (int) $p['harga_satuan'];
+    return $mode === 'dasar' ? (int) $p['harga'] : (int) $p['harga_satuan'];
 }
 
 function label_mode(array $p, string $mode): string
 {
-    return $mode === 'kg' ? 'kg' : (string) $p['satuan'];
+    return $mode === 'dasar' ? (string) $p['satuan_dasar'] : (string) $p['satuan'];
 }
 
-/** Stok yang terpakai (dalam satuan stok) untuk membeli $qty dengan $mode. */
+/** Stok (dalam satuan_dasar, atau jumlah kemasan bila tanpa basis) yang terpakai untuk membeli $qty dengan $mode. */
 function kebutuhan_stok(array $p, string $mode, int $qty): int
 {
-    if ($p['kategori'] === 'Lainnya') {
-        return $qty;
+    if (!jual_dasar($p)) {
+        return $qty; // stok memang disimpan dalam jumlah kemasan
     }
-    return $mode === 'satuan' ? $qty * (int) $p['isi_kg'] : $qty;
+    return $mode === 'satuan' ? $qty * (int) $p['isi_dasar'] : $qty;
 }
 
 /** Jumlah maksimal yang bisa dibeli dengan $mode dari stok saat ini. */
 function maks_beli(array $p, string $mode): int
 {
     $stok = (int) $p['stok'];
-    if ($p['kategori'] === 'Lainnya') {
+    if (!jual_dasar($p)) {
         return $mode === 'satuan' ? $stok : 0;
     }
-    if ($mode === 'kg') {
+    if ($mode === 'dasar') {
         return $stok;
     }
-    return (int) $p['isi_kg'] > 0 ? intdiv($stok, (int) $p['isi_kg']) : 0;
+    return (int) $p['isi_dasar'] > 0 ? intdiv($stok, (int) $p['isi_dasar']) : 0;
 }
 
 function no_pesanan(int $id): string

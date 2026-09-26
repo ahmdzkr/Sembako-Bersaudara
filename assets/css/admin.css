@@ -75,13 +75,7 @@ a.stat:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .filters input,.filters select{font:inherit;padding:.65rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff;min-width:0}
 .filters input{flex:1 1 220px;max-width:340px}
 .filters input:focus,.filters select:focus{border-color:var(--green);outline:0}
-.table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:16px}
-.table{width:100%;border-collapse:collapse;min-width:620px}
-.table th,.table td{padding:.85rem 1.1rem;text-align:left;border-bottom:1px solid var(--line)}
-.table th{background:#faf3e6;font-weight:700;font-size:.92rem;color:var(--muted)}
-.table tr:last-child td{border-bottom:0}
-.table .num{text-align:right}
-.table .center{text-align:center}
+/* .table-wrap/.table dasar dipindah ke style.css supaya dipakai bersama halaman customer */
 
 @media (max-width:1150px){
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -138,3 +132,10 @@ a.stat:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
 .confirm{max-width:560px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.6rem}
 .confirm-actions{display:flex;gap:.8rem;align-items:center;margin-top:1.2rem}
 @media (max-width:900px){.pform{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+
+/* Form produk: kelompok pilihan basis & kemasan Dry Good */
+.grp-pilihdasar{margin-top:1rem}
+.grp-pilihdasar select{width:100%;font:inherit;padding:.7rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+.grp-pilihdasar select:focus{border-color:var(--green);outline:0}
+.grp-satuan-head{margin-top:1.2rem}
+.grp-satuan-head .lbl{font-weight:700}

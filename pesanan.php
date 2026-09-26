@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/includes/config.phpp';
+require __DIR__ . '/includes/config.php';
 require_customer();
 
 $stmt = db()->prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC');

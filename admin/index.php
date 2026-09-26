@@ -12,8 +12,11 @@ $s = db()->query(
 // Nilai persediaan dihitung per baris karena rumus harga berbeda per kategori
 // (Fresh/Dry Good pakai harga per kg, Lainnya pakai harga per satuan).
 $nilai = 0;
-foreach (db()->query('SELECT kategori, harga, harga_satuan, stok FROM products') as $row) {
-    $nilai += $row['kategori'] === 'Lainnya' ? (int) $row['harga_satuan'] * (int) $row['stok'] : (int) $row['harga'] * (int) $row['stok'];
+foreach (db()->query('SELECT satuan_dasar, harga, harga_satuan, stok FROM products') as $row) {
+    // Nilai = harga per satuan yang stoknya memang disimpan dengan satuan itu:
+    // kalau ada basis (kg/liter) stok disimpan dalam basis itu, kalau tidak stok disimpan per kemasan.
+    $adaDasar = ($row['satuan_dasar'] ?? '') !== '';
+    $nilai += ($adaDasar ? (int) $row['harga'] : (int) $row['harga_satuan']) * (int) $row['stok'];
 }
 $s['nilai'] = $nilai;
 $customer = (int) db()->query("SELECT COUNT(*) FROM users WHERE role = 'customer'")->fetchColumn();

@@ -61,8 +61,6 @@ require __DIR__ . '/includes/header.php';
 
       <button type="submit" class="btn">Masuk</button>
     </form>
-
-    <!-- <p class="demo muted">Akun contoh: <b>budi@gmail.com</b> / <b>customer123</b></p> -->
   </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>
