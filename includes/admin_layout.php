@@ -21,8 +21,8 @@ function icon(string $nama, int $ukuran = 20): string
         'printer'=> '<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M6 17h12v4H6z"/>',
     ];
     return '<svg class="ic" width="' . $ukuran . '" height="' . $ukuran . '" viewBox="0 0 24 24" fill="none" '
-         . 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-         . ($p[$nama] ?? '') . '</svg>';
+        . 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        . ($p[$nama] ?? '') . '</svg>';
 }
 
 /**
@@ -34,11 +34,16 @@ function admin_start(string $judulHalaman, string $aktif, string $peran = 'admin
     preg_match('/^./u', $_SESSION['nama'], $huruf);
     $inisial = strtoupper($huruf[0] ?? 'A');
 
-    // Lonceng notifikasi: admin diingatkan stok menipis, kasir diingatkan PO yang menunggu.
+    // Lonceng notifikasi: admin diingatkan stok menipis, kasir diingatkan PO yang menunggu,
+    // owner tidak perlu lonceng (belum ada notifikasi khusus untuk manajemen customer).
     if ($peran === 'kasir') {
         $jumlahNotif = (int) db()->query("SELECT COUNT(*) FROM orders WHERE status = 'menunggu_verifikasi'")->fetchColumn();
         $notifHref   = 'index.php';
         $notifLabel  = $jumlahNotif . ' PO menunggu verifikasi';
+    } elseif ($peran === 'owner') {
+        $jumlahNotif = 0;
+        $notifHref   = 'index.php';
+        $notifLabel  = 'Tidak ada notifikasi';
     } else {
         $jumlahNotif = (int) db()->query('SELECT COUNT(*) FROM products WHERE stok <= ' . LOW_STOCK)->fetchColumn();
         $notifHref   = 'inventory.php?status=perlu';
@@ -60,6 +65,9 @@ function admin_start(string $judulHalaman, string $aktif, string $peran = 'admin
       <?php if ($peran === 'kasir'): ?>
         <a href="index.php"<?= $aktif === 'verifikasi' ? ' class="active" aria-current="page"' : '' ?>><?= icon('clip') ?> Verifikasi PO</a>
         <a href="riwayat.php"<?= $aktif === 'riwayat' ? ' class="active" aria-current="page"' : '' ?>><?= icon('layers') ?> Riwayat PO</a>
+      <?php elseif ($peran === 'owner'): ?>
+        <a href="index.php"<?= $aktif === 'customer' ? ' class="active" aria-current="page"' : '' ?>><?= icon('users') ?> Customer</a>
+        <a href="pelanggan.php"<?= $aktif === 'tambah' ? ' class="active" aria-current="page"' : '' ?>><?= icon('plus') ?> Tambah customer</a>
       <?php else: ?>
         <a href="index.php"<?= $aktif === 'dashboard' ? ' class="active" aria-current="page"' : '' ?>><?= icon('home') ?> Dashboard</a>
         <a href="inventory.php"<?= $aktif === 'inventory' ? ' class="active" aria-current="page"' : '' ?>><?= icon('box') ?> Stok produk</a>

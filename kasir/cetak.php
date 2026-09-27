@@ -64,7 +64,7 @@ $items = order_items_get($id);
 
     <div class="doc-sign">
       <div>Diajukan oleh<div class="line"><?= e($order['nama_penerima']) ?></div></div>
-      <div>Diperiksa &amp; disetujui kasir<div class="line">&nbsp;</div></div>
+      <div>Diperiksa &amp; disetujui kasir<div class="line"><?= e($order['nama_kasir']) ?></div></div>
     </div>
   </main>
 </body>

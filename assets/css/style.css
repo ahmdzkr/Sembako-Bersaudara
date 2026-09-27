@@ -31,7 +31,6 @@ h1,h2{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.1
 .login-brand img{width:min(100%,460px);border-radius:32px}
 .login-panel{align-self:center;width:100%;max-width:420px;padding:2rem;margin-inline:auto}
 .login-panel h1{font-size:2.4rem}
-.demo{margin-top:1.5rem;font-size:.9rem}
 
 /* Beranda */
 .topbar{background:var(--green);color:#fff}

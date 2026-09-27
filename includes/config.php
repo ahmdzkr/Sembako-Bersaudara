@@ -10,6 +10,10 @@ const LOW_STOCK = 100;       // stok (dalam satuan_dasar, atau satuan) <= angka 
 // Kategori produk (tetap 3). Urutan ini dipakai di seluruh halaman.
 const KATEGORI  = ['Fresh Good', 'Dry Good', 'Lainnya'];
 
+// Nilai bawaan saat owner membuat akun customer baru (bisa diubah per customer).
+const DEFAULT_CREDIT_LIMIT = 50000000; // Rp 50 juta
+const DEFAULT_TERMIN_HARI  = 30;       // 30 hari
+
 // Pilihan basis berat/volume untuk Dry Good (Fresh Good selalu 'kg', Lainnya selalu tanpa basis).
 const SATUAN_DASAR_PILIHAN = ['kg' => 'Kilogram (kg)', 'liter' => 'Liter'];
 
@@ -32,7 +36,7 @@ function label_status(string $status): string
 session_start();
 
 // Awalan URL relatif: halaman di folder admin/ atau kasir/ perlu naik satu tingkat.
-define('ROOT', in_array(basename(dirname($_SERVER['SCRIPT_FILENAME'])), ['admin', 'kasir'], true) ? '../' : '');
+define('ROOT', in_array(basename(dirname($_SERVER['SCRIPT_FILENAME'])), ['admin', 'kasir', 'owner'], true) ? '../' : '');
 
 function db(): PDO
 {
@@ -96,6 +100,11 @@ function is_kasir(): bool
     return ($_SESSION['role'] ?? '') === 'kasir';
 }
 
+function is_owner(): bool
+{
+    return ($_SESSION['role'] ?? '') === 'owner';
+}
+
 /** Halaman utama sesuai peran. */
 function home_url(): string
 {
@@ -104,6 +113,9 @@ function home_url(): string
     }
     if (is_kasir()) {
         return ROOT . 'kasir/index.php';
+    }
+    if (is_owner()) {
+        return ROOT . 'owner/index.php';
     }
     return ROOT . 'beranda.php';
 }
@@ -117,11 +129,11 @@ function require_login(): void
     }
 }
 
-/** Halaman khusus customer; admin/kasir diarahkan ke halaman kerja masing-masing. */
+/** Halaman khusus customer; peran staf diarahkan ke halaman kerja masing-masing. */
 function require_customer(): void
 {
     require_login();
-    if (is_admin() || is_kasir()) {
+    if (is_admin() || is_kasir() || is_owner()) {
         header('Location: ' . home_url());
         exit;
     }
@@ -142,6 +154,16 @@ function require_kasir(): void
 {
     require_login();
     if (!is_kasir()) {
+        header('Location: ' . home_url());
+        exit;
+    }
+}
+
+/** Halaman khusus owner; peran lain diarahkan ke halaman masing-masing. */
+function require_owner(): void
+{
+    require_login();
+    if (!is_owner()) {
         header('Location: ' . home_url());
         exit;
     }

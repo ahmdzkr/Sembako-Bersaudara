@@ -15,19 +15,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_valid()) {
         $error = 'Sesi formulir sudah berakhir. Muat ulang halaman lalu coba lagi.';
     } else {
-        $stmt = db()->prepare('SELECT id, nama, password_hash, role FROM users WHERE email = ?');
+        $stmt = db()->prepare('SELECT id, nama, password_hash, role, aktif FROM users WHERE email = ?');
         $stmt->execute([$email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            session_regenerate_id(true);
-            $_SESSION['user_id'] = (int) $user['id'];
-            $_SESSION['nama']    = $user['nama'];
-            $_SESSION['role']    = $user['role'];
-            header('Location: ' . home_url());
-            exit;
+            if (!$user['aktif']) {
+                $error = 'Akun ini sudah dinonaktifkan. Hubungi pemilik toko jika ini keliru.';
+            } else {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = (int) $user['id'];
+                $_SESSION['nama']    = $user['nama'];
+                $_SESSION['role']    = $user['role'];
+                header('Location: ' . home_url());
+                exit;
+            }
+        } else {
+            $error = 'Email atau kata sandi salah. Periksa lagi lalu coba masuk.';
         }
-        $error = 'Email atau kata sandi salah. Periksa lagi lalu coba masuk.';
     }
 }
 
@@ -41,8 +46,8 @@ require __DIR__ . '/includes/header.php';
   </section>
 
   <section class="login-panel">
-    <h1>Selamat datang</h1>
-    <p class="muted">Masuk untuk melihat kebutuhan pokok di toko kami.</p>
+    <h1>Selamat datang kembali</h1>
+    <p class="muted">Masuk ke akun Anda untuk melanjutkan.</p>
 
     <?php if ($error): ?>
       <div class="alert alert-error" role="alert"><?= e($error) ?></div>
@@ -54,17 +59,13 @@ require __DIR__ . '/includes/header.php';
       <?= csrf_field() ?>
       <label for="email">Email</label>
       <input id="email" name="email" type="email" autocomplete="email" required autofocus
-             placeholder="nama@email.com" value="<?= e($_POST['email'] ?? '') ?>">
+            placeholder="nama@email.com" value="<?= e($_POST['email'] ?? '') ?>">
 
       <label for="password">Kata sandi</label>
       <input id="password" name="password" type="password" autocomplete="current-password" required>
 
       <button type="submit" class="btn">Masuk</button>
     </form>
-
-    <p class="demo muted">Akun contoh: <b>budi@gmail.com</b> / <b>customer123</b> (customer) &middot;
-      <b>kasir@sembako.com</b> / <b>kasir123</b> (kasir) &middot;
-      <b>admin@sembako.com</b> / <b>admin123</b> (admin)</p>
   </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>
