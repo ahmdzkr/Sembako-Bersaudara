@@ -6,7 +6,7 @@ require_admin();
 $id    = (int) ($_GET['id'] ?? 0);
 $order = order_get($id);
 if (!$order) { http_response_code(404); exit('Pesanan tidak ditemukan.'); }
-if (!in_array($order['status'], ['siap_diproses', 'siap_kirim', 'dikirim', 'diterima'], true)) {
+if (!in_array($order['status'], ['siap_diproses', 'siap_kirim', 'dikirim', 'menunggu_pembayaran', 'selesai'], true)) {
     $_SESSION['flash'] = ['error', 'Surat jalan baru bisa dicetak setelah PO disetujui kasir.'];
     header('Location: pesanan.php');
     exit;

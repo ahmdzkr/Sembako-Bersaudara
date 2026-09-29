@@ -132,7 +132,8 @@ h1,h2{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.1
 .badge.status-siap_diproses{background:#dcebfd;color:#1d5fa8}
 .badge.status-siap_kirim{background:#e3ddfb;color:#5b3ea6}
 .badge.status-dikirim{background:#fde3cb;color:var(--orange-dark)}
-.badge.status-diterima{background:#e3f3e8;color:var(--green-dark)}
+.badge.status-menunggu_pembayaran{background:#fdf0cc;color:var(--amber)}
+.badge.status-selesai{background:#e3f3e8;color:var(--green-dark)}
 .badge.status-dibatalkan{background:#fde8e6;color:var(--danger)}
 
 @media (max-width:760px){

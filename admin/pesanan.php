@@ -63,13 +63,13 @@ admin_start('Pesanan', 'pesanan');
         <td class="num"><?= rupiah((int) $o['total']) ?></td>
         <td><span class="badge status-<?= e($o['status']) ?>"><?= e(label_status($o['status'])) ?></span></td>
         <td>
-          <?php if (in_array($o['status'], ['siap_diproses', 'siap_kirim', 'dikirim', 'diterima'], true)): ?>
+          <?php if (in_array($o['status'], ['siap_diproses', 'siap_kirim', 'dikirim', 'menunggu_pembayaran', 'selesai'], true)): ?>
             <a href="surat_jalan.php?id=<?= (int) $o['id'] ?>" target="_blank" rel="noopener">Surat jalan</a> ·
             <a href="label.php?id=<?= (int) $o['id'] ?>" target="_blank" rel="noopener">Label</a>
           <?php else: ?>
             <span class="muted">&mdash;</span>
           <?php endif; ?>
-          <?php if ($o['status'] === 'diterima'): ?>
+          <?php if (in_array($o['status'], ['menunggu_pembayaran', 'selesai'], true)): ?>
             · <a href="../invoice.php?id=<?= (int) $o['id'] ?>" target="_blank" rel="noopener">Invoice</a>
           <?php endif; ?>
         </td>

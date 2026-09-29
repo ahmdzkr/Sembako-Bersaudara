@@ -115,7 +115,12 @@ function order_tandai_dikirim(int $orderId): array
     return [true, 'Pesanan ' . no_pesanan($orderId) . ' ditandai dikirim.'];
 }
 
-/** Customer mengonfirmasi barang sudah diterima & sesuai. Invoice otomatis bisa diterbitkan setelah ini. */
+/**
+ * Customer mengonfirmasi barang sudah diterima & sesuai. Ini menerbitkan status
+ * "menunggu pembayaran" — invoice Xendit-nya baru dibuat saat invoice.php pertama
+ * kali dibuka (lihat includes/xendit.php::xendit_buat_invoice), bukan di sini,
+ * supaya konfirmasi terima barang tidak gagal hanya karena Xendit sedang bermasalah.
+ */
 function order_konfirmasi_diterima(int $orderId, int $userId): array
 {
     $order = order_get($orderId);
@@ -125,7 +130,18 @@ function order_konfirmasi_diterima(int $orderId, int $userId): array
     if ($order['status'] !== 'dikirim') {
         return [false, 'Pesanan ini belum berstatus dikirim.'];
     }
-    $q = db()->prepare("UPDATE orders SET status = 'diterima', diterima_at = NOW() WHERE id = ?");
+    $q = db()->prepare("UPDATE orders SET status = 'menunggu_pembayaran', diterima_at = NOW() WHERE id = ?");
     $q->execute([$orderId]);
-    return [true, 'Terima kasih, barang pesanan ' . no_pesanan($orderId) . ' dikonfirmasi diterima. Invoice sudah bisa dilihat.'];
+    return [true, 'Barang pesanan ' . no_pesanan($orderId) . ' dikonfirmasi diterima. Invoice sudah terbit dan menunggu pembayaran.'];
+}
+
+/** Staf menandai lunas secara manual (mis. customer membayar di luar gateway pembayaran). */
+function order_tandai_lunas_staf(int $orderId): array
+{
+    $q = db()->prepare("UPDATE orders SET status = 'selesai', dibayar_at = NOW(), metode_bayar = 'Manual oleh staf' WHERE id = ? AND status = 'menunggu_pembayaran'");
+    $q->execute([$orderId]);
+    if ($q->rowCount() !== 1) {
+        return [false, 'Pesanan ini bukan berstatus menunggu pembayaran.'];
+    }
+    return [true, 'Pesanan ' . no_pesanan($orderId) . ' ditandai lunas secara manual.'];
 }

@@ -8,6 +8,14 @@ $id    = (int) ($_GET['id'] ?? 0);
 $order = order_get($id);
 if (!$order) { http_response_code(404); exit('Pesanan tidak ditemukan.'); }
 $items = order_items_get($id);
+
+// Nama kasir yang memverifikasi (dipakai di kolom tanda tangan). Kosong jika PO belum diverifikasi.
+$order['nama_kasir'] = '';
+if ($order['diverifikasi_oleh']) {
+    $stmtK = db()->prepare('SELECT nama FROM users WHERE id = ?');
+    $stmtK->execute([$order['diverifikasi_oleh']]);
+    $order['nama_kasir'] = (string) $stmtK->fetchColumn();
+}
 ?>
 <!doctype html>
 <html lang="id">

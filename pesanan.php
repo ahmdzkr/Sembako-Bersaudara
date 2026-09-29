@@ -6,9 +6,13 @@ require_customer();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_valid()) {
         $_SESSION['flash'] = ['error', 'Sesi formulir sudah berakhir. Coba lagi.'];
-    } elseif (($_POST['aksi'] ?? '') === 'terima') {
-        [$ok, $pesan] = order_konfirmasi_diterima((int) ($_POST['id'] ?? 0), (int) $_SESSION['user_id']);
-        $_SESSION['flash'] = [$ok ? 'success' : 'error', $pesan];
+    } else {
+        $aksi = $_POST['aksi'] ?? '';
+        $id   = (int) ($_POST['id'] ?? 0);
+        if ($aksi === 'terima') {
+            [$ok, $pesan] = order_konfirmasi_diterima($id, (int) $_SESSION['user_id']);
+            $_SESSION['flash'] = [$ok ? 'success' : 'error', $pesan];
+        }
     }
     header('Location: pesanan.php');
     exit;
@@ -46,7 +50,7 @@ require __DIR__ . '/includes/customer_topbar.php';
   <?php else: ?>
     <div class="orders">
       <?php foreach ($pesanan as $o): ?>
-        <details class="order-card" <?= in_array($o['status'], ['menunggu_verifikasi', 'siap_diproses', 'siap_kirim', 'dikirim'], true) ? 'open' : '' ?>>
+        <details class="order-card" <?= in_array($o['status'], ['menunggu_verifikasi', 'siap_diproses', 'siap_kirim', 'dikirim', 'menunggu_pembayaran'], true) ? 'open' : '' ?>>
           <summary>
             <span class="order-no"><?= e(no_pesanan((int) $o['id'])) ?></span>
             <span class="order-date muted"><?= date('d M Y, H:i', strtotime($o['created_at'])) ?></span>
@@ -56,7 +60,7 @@ require __DIR__ . '/includes/customer_topbar.php';
 
           <ol class="tracker">
             <?php
-            $urutan = ['menunggu_verifikasi', 'siap_diproses', 'siap_kirim', 'dikirim', 'diterima'];
+            $urutan = ['menunggu_verifikasi', 'siap_diproses', 'siap_kirim', 'dikirim', 'menunggu_pembayaran', 'selesai'];
             $posisi = array_search($o['status'], $urutan, true);
             foreach ($urutan as $i => $u):
                 $done = $o['status'] === 'dibatalkan' ? false : $i <= $posisi;
@@ -86,7 +90,9 @@ require __DIR__ . '/includes/customer_topbar.php';
                 <input type="hidden" name="id" value="<?= (int) $o['id'] ?>">
                 <button class="btn" type="submit">Konfirmasi barang diterima</button>
               </form>
-            <?php elseif ($o['status'] === 'diterima'): ?>
+            <?php elseif ($o['status'] === 'menunggu_pembayaran'): ?>
+              <a class="btn" href="invoice.php?id=<?= (int) $o['id'] ?>" target="_blank" rel="noopener">Lihat &amp; bayar invoice</a>
+            <?php elseif ($o['status'] === 'selesai'): ?>
               <a class="btn btn-small" href="invoice.php?id=<?= (int) $o['id'] ?>" target="_blank" rel="noopener">Lihat invoice</a>
             <?php endif; ?>
           </div>

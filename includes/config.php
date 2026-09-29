@@ -14,6 +14,43 @@ const KATEGORI  = ['Fresh Good', 'Dry Good', 'Lainnya'];
 const DEFAULT_CREDIT_LIMIT = 50000000; // Rp 50 juta
 const DEFAULT_TERMIN_HARI  = 30;       // 30 hari
 
+// ============================================================================
+// Konfigurasi Xendit — WAJIB diisi dengan nilai Anda sendiri sebelum pembayaran
+// online aktif. Selama masih nilai bawaan di bawah ini, aplikasi akan
+// menampilkan pesan "belum dikonfigurasi" alih-alih mencoba memanggil Xendit
+// (supaya tidak error tak jelas kalau belum sempat diisi).
+//
+// 1. XENDIT_SECRET_KEY   : Xendit Dashboard > Settings > API Keys.
+//                          Pakai Secret Key bermode TEST dulu untuk uji coba.
+// 2. XENDIT_CALLBACK_TOKEN : Xendit Dashboard > Settings > Webhooks >
+//                          "Verification Token" (bukan URL webhook-nya).
+// 3. APP_BASE_URL        : alamat aplikasi Anda yang BISA DIAKSES PUBLIK
+//                          (https://...). localhost/XAMPP tidak bisa dipakai
+//                          Xendit untuk mengirim webhook — lihat README.
+// ============================================================================
+const XENDIT_SECRET_KEY     = 'xnd_development_GANTI_DENGAN_SECRET_KEY_ANDA';
+const XENDIT_CALLBACK_TOKEN = 'GANTI_DENGAN_VERIFICATION_TOKEN_ANDA';
+const APP_BASE_URL          = 'https://ganti-dengan-domain-anda.com';
+
+function xendit_terkonfigurasi(): bool
+{
+    return XENDIT_SECRET_KEY !== 'xnd_development_GANTI_DENGAN_SECRET_KEY_ANDA';
+}
+
+// ============================================================================
+// Konfigurasi Midtrans (Snap, tampilan pembayaran pop-up bawaan Midtrans).
+// Ini yang AKTIF dipakai untuk pembayaran invoice. Kunci di bawah adalah kunci
+// SANDBOX (uji coba, tanpa uang sungguhan) dari Midtrans Dashboard > Settings >
+// Access Keys. Saat go-live: ganti kedua kunci dengan kunci Production dan
+// ubah MIDTRANS_IS_PRODUCTION menjadi true.
+//
+// SERVER KEY bersifat rahasia — hanya dipakai di sisi server (PHP), jangan
+// pernah dicetak ke HTML/JavaScript. CLIENT KEY memang publik (dipakai snap.js).
+// ============================================================================
+const MIDTRANS_SERVER_KEY    = 'Mid-server-ptUE6hKR2S_QmjAwqKSXa8B5';
+const MIDTRANS_CLIENT_KEY    = 'Mid-client-Yd-Fs3vFvsllbmHN';
+const MIDTRANS_IS_PRODUCTION = false;
+
 // Pilihan basis berat/volume untuk Dry Good (Fresh Good selalu 'kg', Lainnya selalu tanpa basis).
 const SATUAN_DASAR_PILIHAN = ['kg' => 'Kilogram (kg)', 'liter' => 'Liter'];
 
@@ -24,13 +61,26 @@ const STATUS_PESANAN = [
     'siap_diproses'       => 'Siap diproses',
     'siap_kirim'          => 'Siap kirim',
     'dikirim'             => 'Dikirim',
-    'diterima'            => 'Diterima',
+    'menunggu_pembayaran' => 'Menunggu pembayaran',
+    'selesai'             => 'Selesai',
     'dibatalkan'          => 'Dibatalkan',
 ];
 
 function label_status(string $status): string
 {
     return STATUS_PESANAN[$status] ?? $status;
+}
+
+/** Tanggal jatuh tempo invoice = tanggal barang diterima + masa jatuh tempo customer (hari). */
+function jatuh_tempo_invoice(string $diterimaAt, ?int $terminHari): DateTimeImmutable
+{
+    $hari = $terminHari ?? DEFAULT_TERMIN_HARI;
+    return (new DateTimeImmutable($diterimaAt))->modify('+' . $hari . ' days');
+}
+
+function invoice_lewat_tempo(string $diterimaAt, ?int $terminHari): bool
+{
+    return jatuh_tempo_invoice($diterimaAt, $terminHari) < new DateTimeImmutable('now');
 }
 
 session_start();
