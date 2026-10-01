@@ -15,29 +15,6 @@ const DEFAULT_CREDIT_LIMIT = 50000000; // Rp 50 juta
 const DEFAULT_TERMIN_HARI  = 30;       // 30 hari
 
 // ============================================================================
-// Konfigurasi Xendit — WAJIB diisi dengan nilai Anda sendiri sebelum pembayaran
-// online aktif. Selama masih nilai bawaan di bawah ini, aplikasi akan
-// menampilkan pesan "belum dikonfigurasi" alih-alih mencoba memanggil Xendit
-// (supaya tidak error tak jelas kalau belum sempat diisi).
-//
-// 1. XENDIT_SECRET_KEY   : Xendit Dashboard > Settings > API Keys.
-//                          Pakai Secret Key bermode TEST dulu untuk uji coba.
-// 2. XENDIT_CALLBACK_TOKEN : Xendit Dashboard > Settings > Webhooks >
-//                          "Verification Token" (bukan URL webhook-nya).
-// 3. APP_BASE_URL        : alamat aplikasi Anda yang BISA DIAKSES PUBLIK
-//                          (https://...). localhost/XAMPP tidak bisa dipakai
-//                          Xendit untuk mengirim webhook — lihat README.
-// ============================================================================
-const XENDIT_SECRET_KEY     = 'xnd_development_GANTI_DENGAN_SECRET_KEY_ANDA';
-const XENDIT_CALLBACK_TOKEN = 'GANTI_DENGAN_VERIFICATION_TOKEN_ANDA';
-const APP_BASE_URL          = 'https://ganti-dengan-domain-anda.com';
-
-function xendit_terkonfigurasi(): bool
-{
-    return XENDIT_SECRET_KEY !== 'xnd_development_GANTI_DENGAN_SECRET_KEY_ANDA';
-}
-
-// ============================================================================
 // Konfigurasi Midtrans (Snap, tampilan pembayaran pop-up bawaan Midtrans).
 // Ini yang AKTIF dipakai untuk pembayaran invoice. Kunci di bawah adalah kunci
 // SANDBOX (uji coba, tanpa uang sungguhan) dari Midtrans Dashboard > Settings >

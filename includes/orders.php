@@ -117,9 +117,10 @@ function order_tandai_dikirim(int $orderId): array
 
 /**
  * Customer mengonfirmasi barang sudah diterima & sesuai. Ini menerbitkan status
- * "menunggu pembayaran" — invoice Xendit-nya baru dibuat saat invoice.php pertama
- * kali dibuka (lihat includes/xendit.php::xendit_buat_invoice), bukan di sini,
- * supaya konfirmasi terima barang tidak gagal hanya karena Xendit sedang bermasalah.
+ * "menunggu pembayaran" — sesi pembayaran Midtrans (Snap token) baru dibuat saat
+ * customer klik "Bayar sekarang" di invoice.php (lihat includes/midtrans.php::
+ * midtrans_buat_token), bukan di sini, supaya konfirmasi terima barang tidak
+ * gagal hanya karena Midtrans sedang bermasalah.
  */
 function order_konfirmasi_diterima(int $orderId, int $userId): array
 {
