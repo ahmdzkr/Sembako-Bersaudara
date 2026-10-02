@@ -10,12 +10,13 @@ $jumlahKeranjang = cart_count();
     <nav class="ctabs" aria-label="Menu">
       <a href="beranda.php"<?= $halamanAktif === 'beranda' ? ' class="on" aria-current="page"' : '' ?>>Produk</a>
       <a href="pesanan.php"<?= $halamanAktif === 'pesanan' ? ' class="on" aria-current="page"' : '' ?>>Pesanan saya</a>
+      <a href="profil.php"<?= $halamanAktif === 'profil' ? ' class="on" aria-current="page"' : '' ?>>Profil saya</a>
     </nav>
     <div class="user">
       <a class="cart-link" href="keranjang.php" aria-label="Keranjang belanja, <?= $jumlahKeranjang ?> item">
         🛒<?php if ($jumlahKeranjang > 0): ?><span class="cart-dot"><?= $jumlahKeranjang ?></span><?php endif; ?>
       </a>
-      <span class="who-name"><?= e($_SESSION['nama']) ?></span>
+      <a class="who-name" href="profil.php"><?= e($_SESSION['nama']) ?></a>
       <form method="post" action="logout.php">
         <?= csrf_field() ?>
         <button class="btn btn-small" type="submit">Keluar</button>

@@ -218,3 +218,30 @@ a.card *{text-decoration:none}
 .tracker li.done::before{background:var(--green-dark)}
 .order-actions{margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line)}
 .order-actions form{display:inline}
+
+/* ---- Halaman profil customer ---- */
+.profile-form{max-width:640px;display:grid;gap:1.2rem}
+.profile-section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.6rem}
+.profile-section h2{font-size:1.3rem;margin:0 0 .3rem}
+.profile-section > .muted{margin:0 0 1rem}
+.profile-section label{display:block;margin:1rem 0 .3rem;font-weight:700}
+.profile-section form > label:first-of-type{margin-top:0}
+.profile-section input[type=text],
+.profile-section input[type=email],
+.profile-section input[type=tel],
+.profile-section input[type=password],
+.profile-section textarea{width:100%;font:inherit;padding:.75rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+.profile-section input:focus,.profile-section textarea:focus{border-color:var(--green);outline:0}
+.profile-section [aria-invalid="true"]{border-color:var(--danger)}
+.profile-section .btn{margin-top:1.2rem}
+.field-err{margin:.35rem 0 0;color:var(--danger);font-size:.9rem;font-weight:600}
+.profile-two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.profile-readonly{display:grid;grid-template-columns:1fr 1fr;gap:1rem;background:#faf3e6;border-radius:12px;padding:1rem 1.2rem}
+.profile-readonly div{font-size:.9rem;color:var(--muted)}
+.profile-readonly strong{display:block;font:800 1.3rem "Baloo 2",sans-serif;color:var(--green-dark);margin-bottom:.15rem}
+a.who-name{text-decoration:none}
+a.who-name:hover{text-decoration:underline}
+
+@media (max-width:600px){
+  .profile-two,.profile-readonly{grid-template-columns:1fr}
+}
