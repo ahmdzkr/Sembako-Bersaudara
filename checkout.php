@@ -11,7 +11,19 @@ if (!$items) {
 }
 $total = cart_total($items);
 $err   = [];
-$v     = ['nama_penerima' => $_SESSION['nama'], 'telepon' => '', 'alamat' => '', 'catatan' => ''];
+
+// Isi awal dari profil customer, supaya tidak perlu ketik ulang tiap checkout.
+// Kalau form ini disubmit (POST), nilainya ditimpa dengan yang diisi di form (lihat bawah).
+$stmtP = db()->prepare('SELECT no_whatsapp, alamat FROM users WHERE id = ?');
+$stmtP->execute([$_SESSION['user_id']]);
+$profil = $stmtP->fetch() ?: ['no_whatsapp' => '', 'alamat' => ''];
+
+$v = [
+    'nama_penerima' => $_SESSION['nama'],
+    'telepon'       => (string) $profil['no_whatsapp'],
+    'alamat'        => (string) $profil['alamat'],
+    'catatan'       => '',
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_valid()) {
@@ -83,6 +95,7 @@ require __DIR__ . '/includes/customer_topbar.php';
       <label for="alamat">Alamat pengiriman</label>
       <textarea id="alamat" name="alamat" rows="3" required<?= faerr($err, 'alamat') ?>><?= e($v['alamat']) ?></textarea>
       <?= ferr($err, 'alamat') ?>
+      <p class="hint">Nomor telepon dan alamat terisi otomatis dari <a href="profil.php">profil Anda</a>, dan bisa diubah khusus untuk pesanan ini saja.</p>
 
       <label for="catatan">Catatan <span class="muted">(boleh kosong)</span></label>
       <textarea id="catatan" name="catatan" rows="2" maxlength="300"><?= e($v['catatan']) ?></textarea>
