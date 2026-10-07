@@ -115,8 +115,19 @@ h1,h2{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.1
 
 /* Checkout */
 .checkout-grid{display:grid;grid-template-columns:1fr 320px;gap:1.2rem;align-items:start;max-width:960px}
-.co-form textarea{width:100%;font:inherit;padding:.7rem .9rem;border:2px solid var(--line);border-radius:12px}
-.co-summary .rows li{font-size:.92rem}
+.co-form,.co-summary{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem}
+.co-form label{display:block;font-weight:700;margin:1rem 0 .3rem}
+.co-form label:first-of-type{margin-top:0}
+.co-form input[type=text],
+.co-form input[type=tel],
+.co-form textarea{width:100%;font:inherit;padding:.7rem .9rem;border:2px solid var(--line);border-radius:12px;background:#fff}
+.co-form input:focus,.co-form textarea:focus{border-color:var(--green);outline:0}
+.co-form [aria-invalid="true"]{border-color:var(--danger)}
+.co-form .btn{margin-top:1.2rem}
+.co-summary-title{display:block;font-weight:700;margin-bottom:1rem}
+.co-summary .rows{list-style:none;margin:0;padding:0}
+.co-summary .rows li{display:flex;justify-content:space-between;gap:.8rem;font-size:.92rem;padding:.4rem 0;border-bottom:1px solid var(--line)}
+.co-summary .rows li:last-child{border-bottom:0}
 .co-total{display:flex;justify-content:space-between;margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--line);font:800 1.2rem "Baloo 2",sans-serif;color:var(--green-dark)}
 
 /* Riwayat pesanan */
@@ -235,6 +246,7 @@ a.card *{text-decoration:none}
 .profile-section [aria-invalid="true"]{border-color:var(--danger)}
 .profile-section .btn{margin-top:1.2rem}
 .field-err{margin:.35rem 0 0;color:var(--danger);font-size:.9rem;font-weight:600}
+.hint{margin:.5rem 0 0;font-size:.88rem;color:var(--muted)}
 .profile-two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .profile-readonly{display:grid;grid-template-columns:1fr 1fr;gap:1rem;background:#faf3e6;border-radius:12px;padding:1rem 1.2rem}
 .profile-readonly div{font-size:.9rem;color:var(--muted)}

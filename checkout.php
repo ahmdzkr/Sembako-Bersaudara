@@ -82,7 +82,7 @@ require __DIR__ . '/includes/customer_topbar.php';
   <?php if (isset($err['umum'])): ?><div class="alert alert-error" role="alert"><?= e($err['umum']) ?></div><?php endif; ?>
 
   <div class="checkout-grid">
-    <form method="post" class="pform-main co-form" novalidate>
+    <form method="post" class="co-form" novalidate>
       <?= csrf_field() ?>
       <label for="nama_penerima">Nama penerima</label>
       <input id="nama_penerima" name="nama_penerima" type="text" maxlength="100" required value="<?= e($v['nama_penerima']) ?>"<?= faerr($err, 'nama_penerima') ?>>
@@ -95,7 +95,6 @@ require __DIR__ . '/includes/customer_topbar.php';
       <label for="alamat">Alamat pengiriman</label>
       <textarea id="alamat" name="alamat" rows="3" required<?= faerr($err, 'alamat') ?>><?= e($v['alamat']) ?></textarea>
       <?= ferr($err, 'alamat') ?>
-      <p class="hint">Nomor telepon dan alamat terisi otomatis dari <a href="profil.php">profil Anda</a>, dan bisa diubah khusus untuk pesanan ini saja.</p>
 
       <label for="catatan">Catatan <span class="muted">(boleh kosong)</span></label>
       <textarea id="catatan" name="catatan" rows="2" maxlength="300"><?= e($v['catatan']) ?></textarea>
@@ -104,8 +103,8 @@ require __DIR__ . '/includes/customer_topbar.php';
       <p class="hint">Setelah PO dibuat, kasir akan memeriksa dokumen dan keuangan terlebih dahulu sebelum pesanan diproses. Anda bisa memantau statusnya di halaman Pesanan saya.</p>
     </form>
 
-    <aside class="pform-side co-summary">
-      <span class="lbl">Ringkasan pesanan</span>
+    <aside class="co-summary">
+      <span class="co-summary-title">Ringkasan pesanan</span>
       <ul class="rows">
         <?php foreach ($items as $it): ?>
           <li><span><?= e($it['product']['nama']) ?> &times; <?= angka($it['qty']) ?> <?= e($it['label']) ?></span><span><?= rupiah($it['subtotal']) ?></span></li>
